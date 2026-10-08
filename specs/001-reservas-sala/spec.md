@@ -21,10 +21,14 @@ para tener dónde trabajar con mi grupo.
    reserva queda registrada a mi nombre.
 2. **Dado** que elijo como inicio las 10:00 y como fin las 09:00, **Cuando** intento reservar,
    **Entonces** la reserva se rechaza con el mensaje "La hora de fin debe ser posterior a la de inicio".
+3. **Dado** que la "Sala Magna" tiene una reserva confirmada de 10:00 a 12:00, **Cuando** un estudiante intenta reservar la "Sala Magna" de 11:00 a 13:00, **Entonces** la reserva es rechazada con el mensaje "La sala ya tiene una reserva en ese horario" **Y** la nueva reserva no es registrada.
+4. **Dado** que la "Sala Magna" tiene una reserva confirmada de 10:00 a 11:00, **Cuando** un estudiante intenta reservar la "Sala Magna" de 09:00 a 12:00, **Entonces** la reserva es rechazada con el mensaje "La sala ya tiene una reserva en ese horario" **Y** la nueva reserva no es registrada.
+5. **Dado** que la "Sala Magna" tiene una reserva confirmada de 10:00 a 11:00, **Cuando** un estudiante intenta reservar la "Sala Magna" de 11:00 a 12:00, **Entonces** la reserva es confirmada exitosamente.
+6. **Dado** que la "Sala Magna" tiene una reserva confirmada de 10:00 a 12:00, **Cuando** un estudiante intenta reservar la "Sala B" de 10:00 a 12:00, **Entonces** la reserva es confirmada exitosamente.
 
 ### Edge Cases
 
-- ¿Qué pasa si la sala ya está ocupada en ese horario?
+- Una reserva para la misma sala se rechaza si se solapa total o parcialmente con otra reserva confirmada. Se permiten intervalos contiguos y reservas simultáneas en salas distintas.
 
 ## Requirements
 
@@ -38,6 +42,7 @@ para tener dónde trabajar con mi grupo.
 - **FR-004**: La reserva se guarda en la tabla `reservas` de Supabase usando el paquete
   `supabase_flutter`.
 - **FR-005**: La hora de fin debe ser posterior a la hora de inicio.
+- **FR-006**: No se puede registrar una reserva si existe otra reserva confirmada para la misma sala con un intervalo que se solape total o parcialmente. La reserva debe rechazarse con el mensaje "La sala ya tiene una reserva en ese horario" y no debe registrarse. Los intervalos contiguos, donde el inicio de una reserva coincide con el fin de la otra, se permiten. Las reservas de salas distintas pueden coincidir en el tiempo.
 
 ### Key Entities
 

@@ -36,7 +36,89 @@ void main() {
     ));
 
     expect(resultado.aceptada, isFalse);
-    expect(resultado.mensaje, 'La hora de fin debe ser posterior a la de inicio');
+    expect(
+        resultado.mensaje, 'La hora de fin debe ser posterior a la de inicio');
     expect(repositorio.reservas, isEmpty);
+  });
+
+  test('rechaza un solapamiento parcial con una reserva de la misma sala',
+      () async {
+    await crearReserva(SolicitudReserva(
+      salaId: 'Sala Magna',
+      usuarioId: 'u1',
+      inicio: hora(10),
+      fin: hora(12),
+    ));
+
+    final resultado = await crearReserva(SolicitudReserva(
+      salaId: 'Sala Magna',
+      usuarioId: 'u2',
+      inicio: hora(11),
+      fin: hora(13),
+    ));
+
+    expect(resultado.aceptada, isFalse);
+    expect(resultado.mensaje, 'La sala ya tiene una reserva en ese horario');
+    expect(repositorio.reservas, hasLength(1));
+  });
+
+  test('rechaza una reserva que engloba por completo otra de la misma sala',
+      () async {
+    await crearReserva(SolicitudReserva(
+      salaId: 'Sala Magna',
+      usuarioId: 'u1',
+      inicio: hora(10),
+      fin: hora(11),
+    ));
+
+    final resultado = await crearReserva(SolicitudReserva(
+      salaId: 'Sala Magna',
+      usuarioId: 'u2',
+      inicio: hora(9),
+      fin: hora(12),
+    ));
+
+    expect(resultado.aceptada, isFalse);
+    expect(resultado.mensaje, 'La sala ya tiene una reserva en ese horario');
+    expect(repositorio.reservas, hasLength(1));
+  });
+
+  test('acepta una reserva contigua que empieza al terminar la anterior',
+      () async {
+    await crearReserva(SolicitudReserva(
+      salaId: 'Sala Magna',
+      usuarioId: 'u1',
+      inicio: hora(10),
+      fin: hora(11),
+    ));
+
+    final resultado = await crearReserva(SolicitudReserva(
+      salaId: 'Sala Magna',
+      usuarioId: 'u2',
+      inicio: hora(11),
+      fin: hora(12),
+    ));
+
+    expect(resultado.aceptada, isTrue);
+    expect(repositorio.reservas, hasLength(2));
+  });
+
+  test('acepta la misma franja horaria en otra sala', () async {
+    await crearReserva(SolicitudReserva(
+      salaId: 'Sala Magna',
+      usuarioId: 'u1',
+      inicio: hora(10),
+      fin: hora(12),
+    ));
+
+    final resultado = await crearReserva(SolicitudReserva(
+      salaId: 'Sala B',
+      usuarioId: 'u2',
+      inicio: hora(10),
+      fin: hora(12),
+    ));
+
+    expect(resultado.aceptada, isTrue);
+    expect(repositorio.reservas, hasLength(2));
   });
 }
